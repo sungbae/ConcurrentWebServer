@@ -8,7 +8,7 @@ import java.util.logging.*;
 public class JHTTP {
 	
 	private static final Logger logger = Logger.getLogger(JHTTP.class.getCanonicalName());
-	private static final int NUM_THREADS = 50;
+	private static final int NUM_THREADS = 1;
 	private static final String INDEX_FILE = "index.html";
 	
 	private final File rootDirectory;

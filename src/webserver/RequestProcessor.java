@@ -60,9 +60,8 @@ public class RequestProcessor implements Runnable {
 				}
 				
 				File theFile = new File(rootDirectory, fileName.substring(1, fileName.length()));
-				
 				if (theFile.canRead() 
-						// Don't let clients outside the docuemnt root
+						// Don't let clients outside the document root
 						&& theFile.getCanonicalPath().startsWith(root)) {
 					byte[] theData = Files.readAllBytes(theFile.toPath());
 					if (version.startsWith("HTTP/")) { // send a MIME header
@@ -109,5 +108,15 @@ public class RequestProcessor implements Runnable {
 				connection.close();
 			} catch (IOException e) {}
 		}
+	}
+
+	private void sendHeader(Writer out, String responseCode, String contentType, int length) throws IOException {
+		out.write(responseCode + "\r\n");
+		Date now = new Date();
+		out.write("Date: " + now + "\r\n");
+		out.write("Server: JHTTP 2.0\r\n");
+		out.write("Content-length: " + length + "\r\n");
+		out.write("Content-type: " + contentType + "\r\n\r\n");
+		out.flush();
 	}
 }
