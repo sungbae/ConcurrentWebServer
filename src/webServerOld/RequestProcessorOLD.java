@@ -1,20 +1,19 @@
-package webserver;
+package webServerOld;
 
 import java.io.*;
 import java.net.*;
-import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.*;
 
-public class RequestProcessor implements Runnable {
+public class RequestProcessorOLD implements Runnable {
 	
-	private final static Logger logger = Logger.getLogger(RequestProcessor.class.getCanonicalName());
+	private final static Logger logger = Logger.getLogger(RequestProcessorOLD.class.getCanonicalName());
 	private File rootDirectory;
 	private String indexFileName = "index.html";
-	private SocketChannel channel;
+	private Socket connection;
 	
-	public RequestProcessor(File rootDirectory, String indexFileName, SocketChannel socketChannel) {
+	public RequestProcessorOLD(File rootDirectory, String indexFileName, Socket connection) {
 		if (rootDirectory.isFile()) {
 			throw new IllegalArgumentException("rootDirectory must be a directory, not a file");
 		}
@@ -25,7 +24,7 @@ public class RequestProcessor implements Runnable {
 		this.rootDirectory = rootDirectory;
 		
 		if (indexFileName != null) this.indexFileName = indexFileName;
-		this.channel = socketChannel;
+		this.connection = connection;
 	}
 
 	@Override
@@ -33,11 +32,11 @@ public class RequestProcessor implements Runnable {
 		// for security checks
 		String root = rootDirectory.getPath();
 		try {
-			ObjectOutputStream oos = new ObjectOutputStream(channel.socket().getOutputStream());
-			Writer out = new OutputStreamWriter(channel.socket().getOutputStream());
+			OutputStream raw = new BufferedOutputStream(connection.getOutputStream());
+			Writer out = new OutputStreamWriter(raw);
 			Reader in = new InputStreamReader(
 						new BufferedInputStream(
-							(channel.socket().getInputStream())
+							connection.getInputStream()
 							), "US-ASCII");
 			StringBuilder requestLine = new StringBuilder();
 			while (true) {
@@ -46,7 +45,7 @@ public class RequestProcessor implements Runnable {
 				requestLine.append((char) c);
 			}
 			String get = requestLine.toString();
-			logger.info(channel.socket().getRemoteSocketAddress() + " " + get);
+			logger.info(connection.getRemoteSocketAddress() + " " + get);
 			
 			String[] tokens = get.split("\\s+");
 			String method = tokens[0];
@@ -72,8 +71,8 @@ public class RequestProcessor implements Runnable {
 					// send the file; it may be an image or other binary data
 					// so use the underlying output stream
 					// instead of the writer
-					oos.write(theData);
-					oos.flush();
+					raw.write(theData);
+					raw.flush();
 				} else { // can't find the file
 					String body = new StringBuilder("<HTML>\r\n")
 							.append("<HEAD><TITLE>File Not Found</TITLE>\r\n")
@@ -103,10 +102,10 @@ public class RequestProcessor implements Runnable {
 				out.flush();
 			}
 		} catch (IOException e) {
-			logger.log(Level.WARNING, "Error talking to " + channel.socket().getRemoteSocketAddress(), e);
+			logger.log(Level.WARNING, "Error talking to " + connection.getRemoteSocketAddress(), e);
 		} finally {
 			try {
-				channel.close();
+				connection.close();
 			} catch (IOException e) {}
 		}
 	}

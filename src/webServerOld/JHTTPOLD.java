@@ -1,22 +1,21 @@
-package webserver;
+package webServerOld;
 
 import java.io.*;
 import java.net.*;
 import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
 import java.util.concurrent.*;
 import java.util.logging.*;
 
-public class JHTTP {
+public class JHTTPOLD {
 	
-	private static final Logger logger = Logger.getLogger(JHTTP.class.getCanonicalName());
+	private static final Logger logger = Logger.getLogger(JHTTPOLD.class.getCanonicalName());
 	private static final int NUM_THREADS = 1;
 	private static final String INDEX_FILE = "index.html";
 	
 	private final File rootDirectory;
 	private static int port;
 	
-	public JHTTP(File rootDirectory, int port) throws IOException {
+	public JHTTPOLD(File rootDirectory, int port) throws IOException {
 		if (!rootDirectory.isDirectory()) {
 			throw new IOException(rootDirectory + " does not exist as a directory");
 		}
@@ -26,17 +25,14 @@ public class JHTTP {
 	
 	public void start() throws IOException {
 		ExecutorService pool = Executors.newFixedThreadPool(NUM_THREADS);
-		try (ServerSocketChannel serverSocketChannel = ServerSocketChannel.open()) {
-			serverSocketChannel.configureBlocking(false);
-			serverSocketChannel.socket().bind(new InetSocketAddress(port));
-			logger.info("Accepting  connections on port " + port);
+		try (ServerSocket server = new ServerSocket(port)) {
+			logger.info("Accepting  connections on port " + server.getLocalPort());
 			logger.info("Document Root: " + rootDirectory);
 			
 			while (true) {
 				try {
-					//Socket request = server.accept(); 
-					SocketChannel socketChannel = serverSocketChannel.accept();
-					Runnable r = new RequestProcessor(rootDirectory, INDEX_FILE, socketChannel);
+					Socket request = server.accept();
+					Runnable r = new RequestProcessorOLD(rootDirectory, INDEX_FILE, request);
 					pool.submit(r);
 				} catch (IOException ex) {
 					logger.log(Level.WARNING, "Error accepting connection", ex);
@@ -63,7 +59,7 @@ public class JHTTP {
 		}
 		
 		try {
-			JHTTP webServer = new JHTTP(docRoot, port);
+			JHTTPOLD webServer = new JHTTPOLD(docRoot, port);
 			webServer.start();
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Server could not start", e);
