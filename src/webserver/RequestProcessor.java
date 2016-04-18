@@ -72,7 +72,7 @@ public class RequestProcessor implements Runnable {
 					// send the file; it may be an image or other binary data
 					// so use the underlying output stream
 					// instead of the writer
-					oos.write(theData);
+					oos.writeObject(theData);
 					oos.flush();
 				} else { // can't find the file
 					String body = new StringBuilder("<HTML>\r\n")

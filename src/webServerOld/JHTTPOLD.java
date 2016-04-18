@@ -2,14 +2,13 @@ package webServerOld;
 
 import java.io.*;
 import java.net.*;
-import java.nio.channels.ServerSocketChannel;
 import java.util.concurrent.*;
 import java.util.logging.*;
 
 public class JHTTPOLD {
 	
 	private static final Logger logger = Logger.getLogger(JHTTPOLD.class.getCanonicalName());
-	private static final int NUM_THREADS = 1;
+	private static final int NUM_THREADS = 16;
 	private static final String INDEX_FILE = "index.html";
 	
 	private final File rootDirectory;

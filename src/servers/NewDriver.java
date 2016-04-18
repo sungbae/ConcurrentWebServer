@@ -1,18 +1,25 @@
-package webserver;
+package servers;
 
-import java.net.*;
+import java.io.BufferedReader;
+//import java.io.File;
+//import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.io.*;
-
-public class Client extends Thread {
+//import java.util.logging.*;
 	
+public class NewDriver extends Thread {
+	
+	//private static final Logger logger = Logger.getLogger(Driver.class.getCanonicalName());
 	private final static String USER_AGENT = "Mozilla/5.0";
-	private final static int THREADS = 1;
+	
+	private final static int THREADS = 100;
 	static Thread[] thread = new Thread[THREADS];
 	private int threadId;
 	
-	public Client(int threadId) {
+	public NewDriver(int threadId) {
 		this.threadId = threadId;
 	}
 	
@@ -49,7 +56,7 @@ public class Client extends Thread {
 		// print result
 		System.out.println(response.toString() + "\n");
 	}
-	
+
 	public void run() {
 		try {
 			sendGet();
@@ -59,8 +66,20 @@ public class Client extends Thread {
 	}	
 	
 	public static void main(String[] args) {
+		//ThreadPooledServer server = new ThreadPooledServer(File("file_directory/index.html"), 8080);
+		//new Thread(server).start();
+		/*
+		try {
+		    Thread.sleep(20 * 1000);
+		} catch (InterruptedException e) {
+		    e.printStackTrace();
+		}
+		System.out.println("Stopping Server");
+		server.stop();
+		*/
+		
 		for (int i = 0; i < THREADS; i++) {
-			thread[i] = new Client(i);
+			thread[i] = new NewDriver(i);
 		}
 		
 		long startTime = System.currentTimeMillis();

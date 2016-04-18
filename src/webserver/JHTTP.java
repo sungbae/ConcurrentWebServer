@@ -10,7 +10,7 @@ import java.util.logging.*;
 public class JHTTP {
 	
 	private static final Logger logger = Logger.getLogger(JHTTP.class.getCanonicalName());
-	private static final int NUM_THREADS = 1;
+	private static final int NUM_THREADS = 16;
 	private static final String INDEX_FILE = "index.html";
 	
 	private final File rootDirectory;
@@ -36,8 +36,10 @@ public class JHTTP {
 				try {
 					//Socket request = server.accept(); 
 					SocketChannel socketChannel = serverSocketChannel.accept();
-					Runnable r = new RequestProcessor(rootDirectory, INDEX_FILE, socketChannel);
-					pool.submit(r);
+					if (socketChannel != null) {
+						Runnable r = new RequestProcessor(rootDirectory, INDEX_FILE, socketChannel);
+						pool.submit(r);	
+					}
 				} catch (IOException ex) {
 					logger.log(Level.WARNING, "Error accepting connection", ex);
 				}
