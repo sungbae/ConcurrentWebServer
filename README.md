@@ -1,4 +1,5 @@
 # ConcurrentWebServer
+### Sung, Justin
 
 Implement a HTTP web-server to handle the basic HTTP requests. The server must be concurrent, i.e., able to serve more than one request at the same time. Additionally, for logging purposes, the server should be able to record each client's IP address along with the requested files in a shared data-structure.
 
